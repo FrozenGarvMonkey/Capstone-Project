@@ -183,19 +183,17 @@ def main():
 if __name__ == '__main__':
 
     """
-    HOW TO USE
+        HOW TO USE
 
-    Sorry, it became more complicated than what I intended...
+        To process photo images, run following command:
 
-    To process photo images, run following command:
+            python preprocessing.py photo --photo_image_source_path [PHOTO_IMAGE_SOURCE_PATH] --photo_image_save_path [PHOTO_IMAGE_SAVE_PATH]
+        
+        To process animation images, run following command:
 
-    python preprocessing.py photo --photo_image_source_path [PHOTO_IMAGE_SOURCE_PATH] --photo_image_save_path [PHOTO_IMAGE_SAVE_PATH]
-    
-    To process animation images, run following command:
+            python preprocessing.py animation --animation_image_source_path [ANIMATION_IMAGE_SOURCE_PATH] --animation_image_save_path [ANIMATION_IMAGE_SAVE_PATH] --animation_edge_smoothed_save_path [ANIMATION_EDGE_SMOOTHED_SAVE_PATH]
 
-    python preprocessing.py animation --animation_image_source_path [ANIMATION_IMAGE_SOURCE_PATH] --animation_image_save_path [ANIMATION_IMAGE_SAVE_PATH] --animation_edge_smoothed_save_path [ANIMATION_EDGE_SMOOTHED_SAVE_PATH]
-
-    Replace [...] with actual path. These path/directories must exist.
+        Replace [...] with actual path. These path/directories must exist.
     """
 
     main()
