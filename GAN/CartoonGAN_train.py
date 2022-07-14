@@ -11,13 +11,12 @@ class CartoonGANTrainer:
                  photo_image_loader, animation_image_loader, edge_smoothed_image_loader,
                  content_loss_weight=Config.content_loss_weight, lsgan=False):
         """
-        
-        :param generator: CartoonGAN generator
-        :param discriminator: CartoonGAN discriminator
-        :param feature_extractor: feature extractor, VGG in CartoonGAN
-        :param photo_image_loader:
-        :param animation_image_loader:
-        :param edge_smoothed_image_loader:
+            :param generator: CartoonGAN generator
+            :param discriminator: CartoonGAN discriminator
+            :param feature_extractor: feature extractor, VGG in CartoonGAN
+            :param photo_image_loader:
+            :param animation_image_loader:
+            :param edge_smoothed_image_loader:
         """
 
         # just in case our generator and discriminator are not using Config.device
@@ -36,7 +35,7 @@ class CartoonGANTrainer:
             self.disc_criterion = nn.BCEWithLogitsLoss().to(Config.device)  # for discriminator GAN loss
             self.gen_criterion_gan = nn.BCEWithLogitsLoss().to(Config.device)  # for generator GAN loss
         else:
-            # use Least Square GAN
+            # Using Least Square GAN (LSGAN)
             self.disc_criterion = nn.MSELoss().to(Config.device)
             self.gen_criterion_gan = nn.MSELoss().to(Config.device)
         self.gen_criterion_content = nn.L1Loss().to(Config.device)  # for generator content loss
@@ -51,9 +50,7 @@ class CartoonGANTrainer:
         self.loss_content_hist = []
         self.print_every = Config.print_every
 
-    def train(self, num_epochs=Config.num_epochs, initialization_epochs=Config.initialization_epochs,
-              save_path='checkpoints/CartoonGAN/'):
-        # if not initialized, do it!
+    def train(self, num_epochs=Config.num_epochs, initialization_epochs=Config.initialization_epochs, save_path='checkpoints/CartoonGAN/'):
         if self.curr_initialization_epoch < initialization_epochs:
             for init_epoch in range(self.curr_initialization_epoch, initialization_epochs):
                 start = time.time()
@@ -106,7 +103,7 @@ class CartoonGANTrainer:
                                                                           epoch_loss_G / (ix + 1),
                                                                           epoch_loss_content / (ix + 1)))
 
-            # end of epoch
+            # End of Epoch
             print("Training Phase [{0}/{1}], {2:.4f} seconds".format(epoch + 1, num_epochs, time.time() - start))
             self.curr_epoch += 1
 
@@ -128,18 +125,17 @@ class CartoonGANTrainer:
         loss_G = 0
         loss_content = 0
 
-        # 1. Train Discriminator
-        # 1-1. Train Discriminator using animation images
+        # Train Discriminator using animation images
         animation_disc_output = self.discriminator(animation_images)
         animation_target = torch.ones_like(animation_disc_output)
         loss_real = self.disc_criterion(animation_disc_output, animation_target)
 
-        # 1-2. Train Discriminator using edge smoothed images
+        # Train Discriminator using edge smoothed images
         edge_smoothed_disc_output = self.discriminator(edge_smoothed_images)
         edge_smoothed_target = torch.zeros_like(edge_smoothed_disc_output)
         loss_edge = self.disc_criterion(edge_smoothed_disc_output, edge_smoothed_target)
 
-        # 1-3. Train Discriminator using generated images
+        # Train Discriminator using generated images
         generated_images = self.generator(photo_images).detach()
 
         generated_output = self.discriminator(generated_images)
@@ -153,17 +149,18 @@ class CartoonGANTrainer:
 
         self.disc_optimizer.step()
 
-        # 2. Train Generator
+
+
+        # Train Generator using adversarial loss, using generated images
         self.generator.zero_grad()
 
-        # 2-1. Train Generator using adversarial loss, using generated images
         generated_images = self.generator(photo_images)
 
         generated_output = self.discriminator(generated_images)
         generated_target = torch.ones_like(generated_output)
         loss_adv = self.gen_criterion_gan(generated_output, generated_target)
 
-        # 2-2. Train Generator using content loss
+        # Train Generator using content loss
         x_features = self.feature_extractor((photo_images + 1) / 2).detach()
         Gx_features = self.feature_extractor((generated_images + 1) / 2)
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,12 +8,10 @@ try:
 except ImportError:
     from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
-# Inception weights ported to Pytorch from
-# http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz
 FID_WEIGHTS_URL = 'https://github.com/mseitzer/pytorch-fid/releases/download/fid_weights/pt_inception-2015-12-05-6726825d.pth'
 
 
-class InceptionV3(nn.Module):
+class Inception(nn.Module):
     """Pretrained InceptionV3 network returning feature maps"""
 
     # Index of default block of inception to return,
@@ -65,7 +61,7 @@ class InceptionV3(nn.Module):
             strongly advised to set this parameter to true to get comparable
             results.
         """
-        super(InceptionV3, self).__init__()
+        super(Inception, self).__init__()
 
         self.resize_input = resize_input
         self.normalize_input = normalize_input
@@ -78,7 +74,7 @@ class InceptionV3(nn.Module):
         self.blocks = nn.ModuleList()
 
         if use_fid_inception:
-            inception = fid_inception_v3()
+            inception = fid_inception()
         else:
             inception = models.inception_v3(pretrained=True)
 
@@ -162,12 +158,13 @@ class InceptionV3(nn.Module):
         return outp
 
 
-def fid_inception_v3():
-    """Build pretrained Inception model for FID computation
-    The Inception model for FID computation uses a different set of weights
-    and has a slightly different structure than torchvision's Inception.
-    This method first constructs torchvision's Inception and then patches the
-    necessary parts that are different in the FID Inception model.
+def fid_inception():
+    """
+    Build pretrained Inception model for FID computation
+        The Inception model for FID computation uses a different set of weights
+        and has a slightly different structure than torchvision's Inception.
+        This method first constructs torchvision's Inception and then patches the
+        necessary parts that are different in the FID Inception model.
     """
     inception = models.inception_v3(num_classes=1008,
                                     aux_logits=False,

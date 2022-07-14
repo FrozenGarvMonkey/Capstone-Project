@@ -1,0 +1,14 @@
+1. checkpoints\CartoonGAN - Contains Pretrained GAN Models for both Original and Modified CartoonGAN models
+
+2. data - Contains all image data for training and testing.
+
+    - Place gifs/apngs in animation/class folder
+    - Place cartoon/training images in photo/class folder
+    - Place images you want to cartoonify in test/class folder
+
+3. generated_images - Contains all generated images
+
+README.md contains all functions to run and train the system.
+
+FID_SCORE contains comments for running FID functions.
+
